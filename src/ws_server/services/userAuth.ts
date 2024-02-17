@@ -1,9 +1,9 @@
 import { connectDB } from '../dbServices/connectDB';
-import { UserData, UserRegistrationResult } from '../types/commandTypes';
+import { UserData, UserRegistrationData } from '../types/commandTypes';
 
 export const userAuth = async (
   userData: UserData,
-): Promise<UserRegistrationResult> => {
+): Promise<UserRegistrationData> => {
   const db = connectDB();
 
   const userIndex = await db.getUserIndex(userData.name);
@@ -20,11 +20,7 @@ export const userAuth = async (
 
   const authResult = await db.checkPassword(userIndex, userData.password);
 
-  if (!authResult)
-    return {
-      error: true,
-      errorText: 'Incorrect password',
-    };
+  if (!authResult) throw new Error('Incorrect password');
 
   return {
     name: userData.name,

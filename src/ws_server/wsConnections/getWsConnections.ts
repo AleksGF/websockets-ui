@@ -1,8 +1,8 @@
 import { WebSocket } from 'ws';
 
-class WsConnections {
+export class WsConnections {
   private static instance: WsConnections | null = null;
-  public connections: Map<WebSocket, number> = new Map<WebSocket, number>();
+  private connections: Map<WebSocket, number> = new Map<WebSocket, number>();
 
   constructor() {
     if (!WsConnections.instance) {
@@ -10,6 +10,14 @@ class WsConnections {
     }
 
     return WsConnections.instance;
+  }
+
+  getConnections() {
+    return this.connections;
+  }
+
+  getUserIndex(ws: WebSocket) {
+    return this.connections.get(ws);
   }
 
   setNewConnection(ws: WebSocket, index: number) {

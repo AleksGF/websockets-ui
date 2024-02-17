@@ -11,6 +11,7 @@ export const getConnectionHandler = () => (ws: WebSocket) => {
 
   ws.on('close', () => {
     console.log('WebSocket connection closed');
+    //TODO : Remove user from rooms and clear rooms
     wsConnections.clearInactiveConnections();
   });
 
