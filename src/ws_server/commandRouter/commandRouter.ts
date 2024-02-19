@@ -1,18 +1,19 @@
 import { WebSocket } from 'ws';
+import { Command, CommandType } from '../types/commandTypes';
 import { validateCommand } from '../types/validateCommand';
 import { makeResponse } from '../utils/makeResponse';
 import { getWsConnections } from '../wsConnections/getWsConnections';
-import { addUserToRoomHandler } from './AddUserToRoomHandler';
+import { addUserToRoomHandler } from './addUserToRoomHandler';
 import { authHandler } from './authHandler';
 import { createRoomHandler } from './createRoomHandler';
-import { CommandType, IncomingCommand } from '../types/commandTypes';
+import { startGameHandler } from './startGameHandler';
 
 export const getCommandRouter =
   (ws: WebSocket) => async (rawCommand: string) => {
     let commandType: CommandType | '' = '';
 
     try {
-      const commandObj: IncomingCommand = JSON.parse(rawCommand);
+      const commandObj: Command = JSON.parse(rawCommand);
       validateCommand(commandObj);
       commandType = commandObj.type;
 
@@ -39,6 +40,10 @@ export const getCommandRouter =
 
         case CommandType.ADD_USER_TO_ROOM:
           await addUserToRoomHandler(index as number, ws, commandObj.data);
+          break;
+
+        case CommandType.ADD_SHIPS:
+          await startGameHandler(index as number, ws, commandObj.data);
           break;
       }
     } catch (e) {

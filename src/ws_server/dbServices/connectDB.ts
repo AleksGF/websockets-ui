@@ -1,4 +1,10 @@
-import { RoomData, UserData, WinnerData } from '../types/commandTypes';
+import {
+  AddShipsData,
+  GameData,
+  RoomData,
+  UserData,
+  WinnerData,
+} from '../types/commandTypes';
 
 class DB {
   private static instance: DB | null = null;
@@ -7,6 +13,7 @@ class DB {
   })[] = [];
   private rooms: RoomData[] = [];
   private winners: WinnerData[] = [];
+  private games: GameData[] = [];
 
   constructor() {
     if (!DB.instance) {
@@ -52,6 +59,12 @@ class DB {
     );
   }
 
+  async isRoomReady(roomId: number) {
+    return (
+      this.rooms.find((room) => room.roomId === roomId)?.roomUsers.length === 2
+    );
+  }
+
   async createRoom(index: number) {
     const roomId = Math.max(...this.rooms.map((room) => room.roomId), -1) + 1;
     const name = this.users.find((user) => user.index === index)?.name ?? '';
@@ -71,6 +84,37 @@ class DB {
     room.roomUsers.push({ name: user.name, index: user.index });
 
     return await this.getAvailableRooms();
+  }
+
+  async getGameById(gameId: number) {
+    return this.games.find((game) => game.idGame === gameId);
+  }
+
+  async createGame(roomId: number): Promise<GameData> {
+    const idGame = Math.max(...this.games.map((game) => game.idGame), -1) + 1;
+    const room = this.rooms.find((room) => room.roomId === roomId) as RoomData;
+    const playersIds = room.roomUsers.map((user) => user.index);
+
+    const game = {
+      idGame,
+      players: playersIds,
+      turn: 0,
+      shipsData: [null, null],
+      ships: { '0': [], '1': [] },
+      moves: { '0': [], '1': [] },
+    };
+    this.games.push(game);
+
+    return game;
+  }
+
+  async addShipsToGame(shipsData: AddShipsData, shipsArray: number[][]) {
+    const { gameId, ships, indexPlayer } = shipsData;
+    const game = this.games.find((game) => game.idGame === gameId) as GameData;
+    game.shipsData[indexPlayer] = ships;
+    game.ships[indexPlayer] = shipsArray;
+
+    return game;
   }
 
   async getWinners() {

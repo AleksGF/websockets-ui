@@ -20,6 +20,14 @@ export class WsConnections {
     return this.connections.get(ws);
   }
 
+  getWsByIndex(index: number) {
+    for (const [key, value] of this.connections) {
+      if (value === index) {
+        return key;
+      }
+    }
+  }
+
   setNewConnection(ws: WebSocket, index: number) {
     for (const [key, value] of this.connections) {
       if (value === index) {
