@@ -2,6 +2,7 @@ import { WebSocket } from 'ws';
 import { CommandType, ResponseData } from '../types/commandTypes';
 import { getWsConnections } from '../wsConnections/getWsConnections';
 
+//TODO Add sending response to 2 players
 export const makeResponse = (
   ws: WebSocket,
   type: CommandType | '',

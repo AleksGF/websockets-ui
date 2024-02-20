@@ -101,7 +101,7 @@ class DB {
       turn: 0,
       shipsData: [null, null],
       ships: { '0': [], '1': [] },
-      moves: { '0': [], '1': [] },
+      moves: { '0': new Set<number>(), '1': new Set<number>() },
     };
     this.games.push(game);
 
@@ -115,6 +115,31 @@ class DB {
     game.ships[indexPlayer] = shipsArray;
 
     return game;
+  }
+
+  async removeShotShip(
+    gameId: number,
+    indexPlayer: number,
+    indexes: [number, number],
+  ) {
+    const game = this.games.find((game) => game.idGame === gameId) as GameData;
+    game.ships[indexPlayer] = game.ships[indexPlayer].map((ship, index) => {
+      if (index !== indexes[0]) return ship;
+
+      return ship.filter((_, ind) => ind !== indexes[1]);
+    });
+
+    return game.ships[indexPlayer];
+  }
+
+  async addPlayerMove(gameId: number, indexPlayer: number, move: number) {
+    const game = this.games.find((game) => game.idGame === gameId) as GameData;
+    game.moves[indexPlayer].add(move);
+  }
+
+  async toggleTurn(gameId: number) {
+    const game = this.games.find((game) => game.idGame === gameId) as GameData;
+    game.turn = (game.turn + 1) % 2;
   }
 
   async getWinners() {

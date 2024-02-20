@@ -14,6 +14,8 @@ export enum CommandType {
   ADD_SHIPS = 'add_ships',
   START_GAME = 'start_game',
   TURN = 'turn',
+  RANDOM_ATTACK = 'randomAttack',
+  ATTACK = 'attack',
 }
 
 export type UserData = {
@@ -29,13 +31,23 @@ export type RoomData = {
   }[];
 };
 
+export type RandomAttackData = {
+  gameId: number;
+  indexPlayer: number;
+};
+
+export type AttackData = RandomAttackData & {
+  x: number;
+  y: number;
+};
+
 export type GameData = {
   idGame: number;
   players: number[];
   turn: number;
   shipsData: (ShipData[] | null)[];
   ships: Record<number, number[][]>;
-  moves: Record<number, number[][]>;
+  moves: Record<number, Set<number>>;
 };
 
 export type WinnerData = {
@@ -50,6 +62,7 @@ export type ResponseData =
   | CreateGameData
   | StartGameData
   | TurnData
+  | AttackResultData
   | ErrorData;
 
 type ErrorData = { error: true; errorText: string };
@@ -101,4 +114,13 @@ export type AddShipsData = {
 
 type TurnData = {
   currentPlayer: number;
+};
+
+export type AttackResultData = {
+  position: {
+    x: number;
+    y: number;
+  };
+  currentPlayer: number;
+  status: 'miss' | 'killed' | 'shot';
 };
