@@ -2,7 +2,6 @@ import { WebSocket } from 'ws';
 import { addShipsToGame, verifyShipsData } from '../services/gameServices';
 import { AddShipsData, CommandType, ShipData } from '../types/commandTypes';
 import { makeResponse } from '../utils/makeResponse';
-import { getWsConnections } from '../wsConnections/getWsConnections';
 
 export const startGameHandler = async (
   index: number,
@@ -10,7 +9,6 @@ export const startGameHandler = async (
   commandData: string,
 ) => {
   try {
-    const wsConnections = getWsConnections();
     const shipsData = JSON.parse(commandData) as AddShipsData;
 
     await verifyShipsData(shipsData, index);

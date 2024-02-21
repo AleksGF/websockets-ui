@@ -15,9 +15,11 @@ export const addUserToRoomHandler = async (
 
     const createGameResult = await createGame(indexRoom);
 
-    makeResponse(createGameResult.players, CommandType.CREATE_GAME, {
-      idGame: createGameResult.idGame,
-      idPlayer: index,
+    createGameResult.players.forEach((player, idPlayer) => {
+      makeResponse(player, CommandType.CREATE_GAME, {
+        idGame: createGameResult.idGame,
+        idPlayer,
+      });
     });
   } catch (e) {
     const errorText =
