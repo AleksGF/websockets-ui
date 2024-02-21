@@ -4,27 +4,21 @@ import { removeRoom } from '../services/roomServices';
 import { addWinner, getWinners } from '../services/winnerServices';
 import { CommandType } from '../types/commandTypes';
 import { makeResponse } from '../utils/makeResponse';
-import { getWsConnections } from '../wsConnections/getWsConnections';
 
 export const handleWin = async (
-  ws: WebSocket,
+  index: number,
   gameId: number,
   indexPlayer: number,
-  usersWSes: WebSocket[],
+  users: number[],
 ): Promise<void> => {
-  const wsConnections = getWsConnections();
-  const index = wsConnections.getUserIndex(ws) as number;
-
   await addWinner(index);
 
-  usersWSes.forEach((userWs) => {
-    makeResponse(userWs, CommandType.FINISH, {
-      winPlayer: indexPlayer,
-    });
+  makeResponse(users, CommandType.FINISH, {
+    winPlayer: indexPlayer,
   });
 
   const updateWinnersResult = await getWinners();
-  makeResponse(ws, CommandType.UPDATE_WINNERS, updateWinnersResult);
+  makeResponse(index, CommandType.UPDATE_WINNERS, updateWinnersResult);
 
   await removeRoom(index);
 

@@ -19,21 +19,13 @@ export const startGameHandler = async (
 
     if (game.shipsData.some((data) => data === null)) return;
 
-    const usersWSes = game.players.map((player) => {
-      const userWs = wsConnections.getWsByIndex(player);
-
-      if (!userWs) throw new Error('User connection not found');
-
-      return userWs;
+    makeResponse(game.players, CommandType.START_GAME, {
+      ships: game.shipsData[index] as ShipData[],
+      currentPlayerIndex: index,
     });
-    usersWSes.forEach((userWs, index) => {
-      makeResponse(userWs, CommandType.START_GAME, {
-        ships: game.shipsData[index] as ShipData[],
-        currentPlayerIndex: index,
-      });
-      makeResponse(userWs, CommandType.TURN, {
-        currentPlayer: game.turn,
-      });
+
+    makeResponse(game.players, CommandType.TURN, {
+      currentPlayer: game.turn,
     });
   } catch (e) {
     const errorText =
@@ -43,6 +35,6 @@ export const startGameHandler = async (
       typeof e.message === 'string'
         ? e.message
         : 'Add ships error';
-    makeResponse(ws, CommandType.ADD_SHIPS, { error: true, errorText });
+    makeResponse(index, CommandType.ADD_SHIPS, { error: true, errorText });
   }
 };

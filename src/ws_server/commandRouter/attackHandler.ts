@@ -1,4 +1,3 @@
-import { WebSocket } from 'ws';
 import {
   getAroundKilledResults,
   getAttackResult,
@@ -7,24 +6,22 @@ import {
   validateTurn,
 } from '../services/attackServices';
 import { getGameById } from '../services/gameServices';
-import { addWinner, getWinners, isWinner } from '../services/winnerServices';
+import { isWinner } from '../services/winnerServices';
 import {
   AttackData,
   CommandType,
   RandomAttackData,
 } from '../types/commandTypes';
 import { makeResponse } from '../utils/makeResponse';
-import { getWsConnections } from '../wsConnections/getWsConnections';
 import { handleWin } from './handleWin';
 
 export const attackHandler = async (
-  ws: WebSocket,
+  index: number,
   commandData: string,
   randomX?: number,
   randomY?: number,
 ): Promise<void> => {
   try {
-    const wsConnections = getWsConnections();
     const commandObj = JSON.parse(commandData) as RandomAttackData | AttackData;
 
     const { gameId, indexPlayer } = commandObj;
@@ -39,18 +36,11 @@ export const attackHandler = async (
     const attackResult = await getAttackResult(gameId, indexPlayer, x, y);
 
     const game = await getGameById(gameId);
-    const usersWSes = game.players.map((player) => {
-      const userWs = wsConnections.getWsByIndex(player);
 
-      if (!userWs) throw new Error('User connection not found');
+    makeResponse(game.players, CommandType.ATTACK, attackResult);
 
-      return userWs;
-    });
-    usersWSes.forEach((userWs, index) => {
-      makeResponse(userWs, CommandType.ATTACK, attackResult);
-      makeResponse(userWs, CommandType.TURN, {
-        currentPlayer: game.turn,
-      });
+    makeResponse(game.players, CommandType.TURN, {
+      currentPlayer: game.turn,
     });
 
     if (attackResult.status === 'killed') {
@@ -62,11 +52,9 @@ export const attackHandler = async (
       );
 
       aroundResults.forEach((result) => {
-        usersWSes.forEach((userWs, index) => {
-          makeResponse(userWs, CommandType.ATTACK, result);
-          makeResponse(userWs, CommandType.TURN, {
-            currentPlayer: game.turn,
-          });
+        makeResponse(game.players, CommandType.ATTACK, result);
+        makeResponse(game.players, CommandType.TURN, {
+          currentPlayer: game.turn,
         });
       });
     }
@@ -75,7 +63,7 @@ export const attackHandler = async (
       attackResult.status === 'killed' &&
       (await isWinner(gameId, indexPlayer))
     ) {
-      await handleWin(ws, gameId, indexPlayer, usersWSes);
+      await handleWin(index, gameId, indexPlayer, game.players);
     }
   } catch (e) {
     const errorText =
@@ -85,7 +73,7 @@ export const attackHandler = async (
       typeof e.message === 'string'
         ? e.message
         : 'Attack error';
-    makeResponse(ws, CommandType.ATTACK, {
+    makeResponse(index, CommandType.ATTACK, {
       error: true,
       errorText,
     });
@@ -93,7 +81,7 @@ export const attackHandler = async (
 };
 
 export const randomCoordsHandler = async (
-  ws: WebSocket,
+  index: number,
   commandData: string,
 ): Promise<{ x: number; y: number } | undefined> => {
   try {
@@ -109,7 +97,7 @@ export const randomCoordsHandler = async (
       typeof e.message === 'string'
         ? e.message
         : 'Random attack error';
-    makeResponse(ws, CommandType.RANDOM_ATTACK, {
+    makeResponse(index, CommandType.RANDOM_ATTACK, {
       error: true,
       errorText,
     });

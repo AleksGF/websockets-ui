@@ -2,9 +2,8 @@ import { WebSocket } from 'ws';
 import { CommandType, ResponseData } from '../types/commandTypes';
 import { getWsConnections } from '../wsConnections/getWsConnections';
 
-//TODO Add sending response to 2 players
 export const makeResponse = (
-  ws: WebSocket,
+  receivers: number | number[] | WebSocket,
   type: CommandType | '',
   responseObj: ResponseData,
 ) => {
@@ -22,7 +21,35 @@ export const makeResponse = (
     for (const wsConnection of wsConnections.getConnections().keys()) {
       wsConnection.send(response);
     }
-  } else {
-    ws.send(response);
+
+    return;
   }
+
+  if (receivers instanceof WebSocket) {
+    receivers.send(response);
+
+    return;
+  }
+
+  if (Array.isArray(receivers)) {
+    const usersWSes = receivers.map((receiver) => {
+      const userWs = wsConnections.getWsByIndex(receiver);
+
+      if (!userWs) throw new Error('User connection not found');
+
+      return userWs;
+    });
+
+    usersWSes.forEach((userWs) => {
+      userWs.send(response);
+    });
+
+    return;
+  }
+
+  const userWs = wsConnections.getWsByIndex(receivers);
+
+  if (!userWs) throw new Error('User connection not found');
+
+  userWs.send(response);
 };

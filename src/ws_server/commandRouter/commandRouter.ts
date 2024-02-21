@@ -37,11 +37,11 @@ export const getCommandRouter =
           break;
 
         case CommandType.CREATE_ROOM:
-          await createRoomHandler(index as number, ws);
+          await createRoomHandler(index as number);
           break;
 
         case CommandType.ADD_USER_TO_ROOM:
-          await addUserToRoomHandler(index as number, ws, commandObj.data);
+          await addUserToRoomHandler(index as number, commandObj.data);
           break;
 
         case CommandType.ADD_SHIPS:
@@ -49,21 +49,24 @@ export const getCommandRouter =
           break;
 
         case CommandType.RANDOM_ATTACK:
-          const coords = await randomCoordsHandler(ws, commandObj.data);
+          const coords = await randomCoordsHandler(
+            index as number,
+            commandObj.data,
+          );
 
           if (coords) {
             const { x, y } = coords;
-            await attackHandler(ws, commandObj.data, x, y);
+            await attackHandler(index as number, commandObj.data, x, y);
           }
 
           break;
 
         case CommandType.ATTACK:
-          await attackHandler(ws, commandObj.data);
+          await attackHandler(index as number, commandObj.data);
           break;
 
         default:
-          makeResponse(ws, commandType, {
+          makeResponse(index as number, commandType, {
             error: true,
             errorText: 'Invalid command type',
           });

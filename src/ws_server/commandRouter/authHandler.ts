@@ -11,18 +11,19 @@ export const authHandler = async (ws: WebSocket, commandData: string) => {
 
   try {
     const userAuthResultData = await userAuth(JSON.parse(commandData));
+    const { index } = userAuthResultData;
 
-    wsConnections.setNewConnection(ws, userAuthResultData.index);
+    wsConnections.setNewConnection(ws, index);
 
-    makeResponse(ws, CommandType.REG, userAuthResultData);
+    makeResponse(index, CommandType.REG, userAuthResultData);
 
     const updateRoomsResult = await getAvailableRooms();
 
-    makeResponse(ws, CommandType.UPDATE_ROOM, updateRoomsResult);
+    makeResponse(index, CommandType.UPDATE_ROOM, updateRoomsResult);
 
     const updateWinnersResult = await getWinners();
 
-    makeResponse(ws, CommandType.UPDATE_WINNERS, updateWinnersResult);
+    makeResponse(index, CommandType.UPDATE_WINNERS, updateWinnersResult);
   } catch (e) {
     const errorText =
       e &&
