@@ -19,9 +19,22 @@ export enum CommandType {
   FINISH = 'finish',
 }
 
+export type RequestData =
+  | UserData
+  | CreateRoomData
+  | AddUserToRoomData
+  | RandomAttackData
+  | AttackData;
+
 export type UserData = {
   name: string;
   password: string;
+};
+
+type CreateRoomData = '';
+
+type AddUserToRoomData = {
+  indexRoom: number;
 };
 
 export type RoomData = {
@@ -51,11 +64,6 @@ export type GameData = {
   moves: Record<number, Set<number>>;
 };
 
-export type WinnerData = {
-  name: string;
-  wins: number;
-};
-
 export type ResponseData =
   | UserRegistrationData
   | UpdateRoomData
@@ -65,6 +73,7 @@ export type ResponseData =
   | TurnData
   | AttackResultData
   | FinishData
+  | WinnerData
   | ErrorData;
 
 type ErrorData = { error: true; errorText: string };
@@ -129,4 +138,9 @@ export type AttackResultData = {
 
 type FinishData = {
   winPlayer: number;
+};
+
+export type WinnerData = {
+  name: string;
+  wins: number;
 };
