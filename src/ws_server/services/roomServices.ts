@@ -31,3 +31,9 @@ export const addUserToRoom = async (
 
   return await db.addUserToRoom(index, roomId);
 };
+
+export const removeRoom = async (index: number): Promise<void> => {
+  const db = connectDB();
+
+  await db.removeRoomByUserIndex(index);
+};

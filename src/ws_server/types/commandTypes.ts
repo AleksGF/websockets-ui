@@ -16,6 +16,7 @@ export enum CommandType {
   TURN = 'turn',
   RANDOM_ATTACK = 'randomAttack',
   ATTACK = 'attack',
+  FINISH = 'finish',
 }
 
 export type UserData = {
@@ -63,6 +64,7 @@ export type ResponseData =
   | StartGameData
   | TurnData
   | AttackResultData
+  | FinishData
   | ErrorData;
 
 type ErrorData = { error: true; errorText: string };
@@ -123,4 +125,8 @@ export type AttackResultData = {
   };
   currentPlayer: number;
   status: 'miss' | 'killed' | 'shot';
+};
+
+type FinishData = {
+  winPlayer: number;
 };

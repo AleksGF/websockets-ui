@@ -1,5 +1,5 @@
 import { connectDB } from '../dbServices/connectDB';
-import { AttackResultData, GameData } from '../types/commandTypes';
+import { AttackResultData, GameData, ShipData } from '../types/commandTypes';
 
 const getShotIndexes = (
   enemyShips: number[][],
@@ -92,6 +92,67 @@ export const getRandomCoords = async (
   const randomMove = possibleMoves[randomIndex];
 
   return { x: randomMove % 10, y: Math.floor(randomMove / 10) };
+};
+
+export const getAroundKilledResults = async (
+  gameId: number,
+  indexPlayer: number,
+  x: number,
+  y: number,
+): Promise<AttackResultData[]> => {
+  const db = connectDB();
+
+  const game = (await db.getGameById(gameId)) as GameData;
+  const playerMoves = game.moves[indexPlayer];
+  const enemyIndex = Number(
+    Object.keys(game.ships).filter((key) => key !== String(indexPlayer))[0],
+  );
+  const enemyShipsData = game.shipsData[enemyIndex] as ShipData[];
+
+  const ship = enemyShipsData
+    .map((ship) => {
+      const { position, direction, length } = ship;
+      const shipCoords: number[] = [];
+
+      for (let i = 0; i < length; i++) {
+        if (direction) {
+          const y = position.y + i;
+          shipCoords.push(position.x + y * 10);
+        } else {
+          const x = position.x + i;
+          shipCoords.push(x + position.y * 10);
+        }
+      }
+
+      return shipCoords;
+    })
+    .filter((ship) => ship.includes(x + y * 10))[0];
+
+  const aroundCoords: { x: number; y: number }[] = [];
+
+  for await (const coord of ship) {
+    for (let i = -1; i <= 1; i += 1) {
+      for (let j = -1; j <= 1; j += 1) {
+        const x = (coord % 10) + i;
+        const y = Math.floor(coord / 10) + j;
+
+        if (x < 0 || x > 9 || y < 0 || y > 9) continue;
+
+        const newCoord = x + y * 10;
+
+        if (ship.includes(newCoord) || playerMoves.has(newCoord)) continue;
+
+        await db.addPlayerMove(gameId, indexPlayer, newCoord);
+        aroundCoords.push({ x: newCoord % 10, y: Math.floor(newCoord / 10) });
+      }
+    }
+  }
+
+  return aroundCoords.map((coord) => ({
+    position: coord,
+    currentPlayer: indexPlayer,
+    status: 'miss',
+  }));
 };
 
 export const validateTurn = async (

@@ -35,6 +35,10 @@ class DB {
     return this.users.find((user) => user.name === name)?.index;
   }
 
+  async getUserName(index: number) {
+    return this.users.find((user) => user.index === index)?.name;
+  }
+
   async checkPassword(index: number, password: string) {
     const user = this.users.find((user) => user.index === index);
 
@@ -86,6 +90,12 @@ class DB {
     return await this.getAvailableRooms();
   }
 
+  async removeRoomByUserIndex(index: number) {
+    this.rooms = this.rooms.filter(
+      (room) => !room.roomUsers.find((user) => user.index === index),
+    );
+  }
+
   async getGameById(gameId: number) {
     return this.games.find((game) => game.idGame === gameId);
   }
@@ -132,6 +142,10 @@ class DB {
     return game.ships[indexPlayer];
   }
 
+  async removeGame(gameId: number) {
+    this.games = this.games.filter((game) => game.idGame !== gameId);
+  }
+
   async addPlayerMove(gameId: number, indexPlayer: number, move: number) {
     const game = this.games.find((game) => game.idGame === gameId) as GameData;
     game.moves[indexPlayer].add(move);
@@ -144,6 +158,16 @@ class DB {
 
   async getWinners() {
     return this.winners;
+  }
+
+  async addWinner(name: string) {
+    const winnerInDB = this.winners.find((winner) => winner.name === name);
+
+    if (winnerInDB) {
+      winnerInDB.wins += 1;
+    } else {
+      this.winners.push({ name, wins: 1 });
+    }
   }
 }
 

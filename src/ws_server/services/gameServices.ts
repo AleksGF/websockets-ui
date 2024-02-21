@@ -88,9 +88,6 @@ export const addShipsToGame = async (shipsData: AddShipsData) => {
     return shipCoords;
   });
 
-  console.log(shipsData.ships.map((ship) => ship.position));
-  console.log(shipsArray);
-
   return await db.addShipsToGame(shipsData, shipsArray);
 };
 
@@ -102,4 +99,10 @@ export const getGameById = async (gameId: number) => {
   if (!game) throw new Error('Invalid game id');
 
   return game;
+};
+
+export const removeGame = async (gameId: number) => {
+  const db = connectDB();
+
+  await db.removeGame(gameId);
 };

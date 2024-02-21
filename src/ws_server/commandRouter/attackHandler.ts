@@ -1,11 +1,13 @@
 import { WebSocket } from 'ws';
 import {
+  getAroundKilledResults,
   getAttackResult,
   getRandomCoords,
   validateCoords,
   validateTurn,
 } from '../services/attackServices';
 import { getGameById } from '../services/gameServices';
+import { addWinner, getWinners, isWinner } from '../services/winnerServices';
 import {
   AttackData,
   CommandType,
@@ -13,6 +15,7 @@ import {
 } from '../types/commandTypes';
 import { makeResponse } from '../utils/makeResponse';
 import { getWsConnections } from '../wsConnections/getWsConnections';
+import { handleWin } from './handleWin';
 
 export const attackHandler = async (
   ws: WebSocket,
@@ -51,10 +54,28 @@ export const attackHandler = async (
     });
 
     if (attackResult.status === 'killed') {
-      //send state for all cells around killed ship
-      //TODO Check if win
-      //finish
-      //update_winners
+      const aroundResults = await getAroundKilledResults(
+        gameId,
+        indexPlayer,
+        x,
+        y,
+      );
+
+      aroundResults.forEach((result) => {
+        usersWSes.forEach((userWs, index) => {
+          makeResponse(userWs, CommandType.ATTACK, result);
+          makeResponse(userWs, CommandType.TURN, {
+            currentPlayer: game.turn,
+          });
+        });
+      });
+    }
+
+    if (
+      attackResult.status === 'killed' &&
+      (await isWinner(gameId, indexPlayer))
+    ) {
+      await handleWin(ws, gameId, indexPlayer, usersWSes);
     }
   } catch (e) {
     const errorText =
