@@ -17,9 +17,11 @@ export const startGameHandler = async (
 
     if (game.shipsData.some((data) => data === null)) return;
 
-    makeResponse(game.players, CommandType.START_GAME, {
-      ships: game.shipsData[index] as ShipData[],
-      currentPlayerIndex: index,
+    game.players.forEach((player, playerId) => {
+      makeResponse(player, CommandType.START_GAME, {
+        ships: game.shipsData[playerId] as ShipData[],
+        currentPlayerIndex: playerId,
+      });
     });
 
     makeResponse(game.players, CommandType.TURN, {
