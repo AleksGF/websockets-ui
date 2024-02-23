@@ -23,6 +23,7 @@ export type RequestData =
   | UserData
   | CreateRoomData
   | AddUserToRoomData
+  | AddShipsData
   | RandomAttackData
   | AttackData;
 
@@ -35,6 +36,12 @@ type CreateRoomData = '';
 
 type AddUserToRoomData = {
   indexRoom: number;
+};
+
+export type AddShipsData = {
+  gameId: number;
+  ships: ShipData[];
+  indexPlayer: number;
 };
 
 export type RoomData = {
@@ -115,12 +122,6 @@ export type ShipData = {
 type StartGameData = {
   ships: ShipData[];
   currentPlayerIndex: number;
-};
-
-export type AddShipsData = {
-  gameId: number;
-  ships: ShipData[];
-  indexPlayer: number;
 };
 
 type TurnData = {

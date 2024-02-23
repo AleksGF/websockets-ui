@@ -32,7 +32,6 @@ export const getCommandRouter =
 
       switch (commandType) {
         case CommandType.REG:
-          // TODO handle user exit and reenter
           await authHandler(ws, commandObj.data);
           break;
 
