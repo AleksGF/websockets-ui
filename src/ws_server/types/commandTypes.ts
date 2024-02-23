@@ -17,6 +17,7 @@ export enum CommandType {
   RANDOM_ATTACK = 'randomAttack',
   ATTACK = 'attack',
   FINISH = 'finish',
+  SINGLE_PLAY = 'single_play',
 }
 
 export type RequestData =

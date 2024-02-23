@@ -7,6 +7,7 @@ import { addUserToRoomHandler } from './addUserToRoomHandler';
 import { attackHandler, randomCoordsHandler } from './attackHandler';
 import { authHandler } from './authHandler';
 import { createRoomHandler } from './createRoomHandler';
+import { handleSinglePlay } from './handleSinglePlay';
 import { startGameHandler } from './startGameHandler';
 
 export const getCommandRouter =
@@ -62,6 +63,10 @@ export const getCommandRouter =
 
         case CommandType.ATTACK:
           await attackHandler(index as number, commandObj.data);
+          break;
+
+        case CommandType.SINGLE_PLAY:
+          await handleSinglePlay(index as number);
           break;
 
         default:
