@@ -2,7 +2,7 @@ import { WebSocket } from 'ws';
 import { CommandType } from '../../ws_server/types/commandTypes';
 import { getRandomString } from '../services/registrationServices';
 
-export const handleRegistration = async (wsClient: WebSocket) => {
+export const handleRegistration = (wsClient: WebSocket) => {
   const name = 'bot_' + getRandomString(3);
   const password = getRandomString(8);
 
