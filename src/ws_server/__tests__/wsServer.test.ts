@@ -91,17 +91,32 @@ describe('WS Server:', () => {
     });
   }, maxTestDuration);
 
-  afterAll(async () => {
-    await user1.close();
-    await user2.close();
-    await new Promise<void>((resolve) => {
-      httpServer.close(() => {
+  afterAll((done) => {
+    const fn = async () => {
+      await user1.close();
+      await user2.close();
+
+      await new Promise<void>((resolve) => {
+        wsServer.on('close', () => {
+          resolve();
+        });
         wsServer.close();
-        resolve();
       });
+
+      await new Promise<void>((resolve) => {
+        httpServer.close(() => {
+          resolve();
+        });
+      });
+    };
+
+    fn().then(() => {
+      setTimeout(() => {
+        console.log = originalLog;
+        done();
+      }, 5000);
     });
-    console.log = originalLog;
-  });
+  }, maxTestDuration);
 
   it('should register users', async () => {
     let responses = await user1.send(
