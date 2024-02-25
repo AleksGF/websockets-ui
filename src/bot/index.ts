@@ -103,5 +103,5 @@ const startBot = async () => {
 };
 
 startBot().then((code) => {
-  process.exit(code === 0 ? 0 : 1);
+  process.exit(code ?? 1);
 });

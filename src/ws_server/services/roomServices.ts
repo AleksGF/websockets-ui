@@ -37,3 +37,11 @@ export const removeRoom = async (index: number): Promise<void> => {
 
   await db.removeRoomByUserIndex(index);
 };
+
+export const removeUsersFromRoom = async (users: number[]) => {
+  const db = connectDB();
+
+  for await (const user of users) {
+    await db.removeRoomByUserIndex(user);
+  }
+};

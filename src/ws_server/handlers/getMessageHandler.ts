@@ -1,5 +1,5 @@
 import { RawData, WebSocket } from 'ws';
-import { getCommandRouter } from './commandRouter/commandRouter';
+import { getCommandRouter } from '../commandRouter/commandRouter';
 
 export const getMessageHandler =
   (ws: WebSocket) => async (message: RawData) => {

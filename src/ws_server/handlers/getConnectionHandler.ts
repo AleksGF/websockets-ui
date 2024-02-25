@@ -1,6 +1,7 @@
 import { WebSocket } from 'ws';
 import { getMessageHandler } from './getMessageHandler';
-import { getWsConnections } from './wsConnections/getWsConnections';
+import { getConnectionCloseHandler } from './getConnectionCloseHandler';
+import { getWsConnections } from '../wsConnections/getWsConnections';
 
 export const getConnectionHandler = () => (ws: WebSocket) => {
   const wsConnections = getWsConnections();
@@ -9,11 +10,7 @@ export const getConnectionHandler = () => (ws: WebSocket) => {
     console.log(error);
   });
 
-  ws.on('close', () => {
-    console.log('WebSocket connection closed');
-    //TODO : Remove user from rooms and clear rooms
-    wsConnections.clearInactiveConnections();
-  });
+  ws.on('close', getConnectionCloseHandler(wsConnections));
 
   ws.on('message', getMessageHandler(ws));
 };

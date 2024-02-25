@@ -41,11 +41,16 @@ export class WsConnections {
   }
 
   clearInactiveConnections() {
+    const disconnectedUsers: number[] = [];
+
     for (const [key, value] of this.connections) {
       if (key.readyState > 1) {
+        disconnectedUsers.push(value);
         this.connections.delete(key);
       }
     }
+
+    return disconnectedUsers;
   }
 }
 
