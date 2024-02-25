@@ -11,13 +11,15 @@
 
 `npm run start:dev`
 
-* App served @ `http://localhost:8181` with nodemon
+* App served @ `http://localhost:8181` with ts-node-dev
+* WebSocket Server listens port 3000
 
 **Production**
 
 `npm run start`
 
-* App served @ `http://localhost:8181` without nodemon
+* App served @ `http://localhost:8181` with ts-node
+* WebSocket Server listens port 3000
 
 ---
 
@@ -25,7 +27,7 @@
 
 Command | Description
 --- | ---
-`npm run start:dev` | App served @ `http://localhost:8181` with nodemon
-`npm run start` | App served @ `http://localhost:8181` without nodemon
+`npm run start:dev` | App served @ `http://localhost:8181` (WebSocket server on port 3000) with ts-node-dev
+`npm run start` | App served @ `http://localhost:8181` (WebSocket server on port 3000) with ts-node
 
 **Note**: replace `npm` with `yarn` in `package.json` if you use yarn.
