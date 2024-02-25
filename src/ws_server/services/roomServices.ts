@@ -22,7 +22,6 @@ export const addUserToRoom = async (
 ): Promise<UpdateRoomData> => {
   const db = connectDB();
 
-  //TODO add ability to add to already created by other user room
   if (await db.isUserInSomeRoom(index))
     throw new Error('User already in another room');
 

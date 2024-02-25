@@ -52,7 +52,9 @@ class DB {
   async isUserInSomeRoom(index: number) {
     return (
       this.rooms.filter(
-        (room) => !!room.roomUsers.find((user) => user.index === index),
+        (room) =>
+          room.roomUsers.length > 1 &&
+          !!room.roomUsers.find((user) => user.index === index),
       ).length > 0
     );
   }
@@ -80,6 +82,10 @@ class DB {
   }
 
   async addUserToRoom(index: number, roomId: number) {
+    this.rooms = this.rooms.filter(
+      (room) => !room.roomUsers.find((user) => user.index === index),
+    );
+
     const user = this.users.find((user) => user.index === index) as UserData & {
       index: number;
     };
