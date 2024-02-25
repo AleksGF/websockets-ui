@@ -22,17 +22,21 @@ httpServer.on('upgrade', (request, socket, head) => {
 
 httpServer.on('close', async () => {
   await new Promise<void>((resolve) => {
-    const timeLimit = 10000;
-    const startTime = Date.now();
+    if (!wsServer.clients.size) {
+      resolve();
+    } else {
+      const timeLimit = 10000;
+      const startTime = Date.now();
 
-    Array.from(wsServer.clients).forEach((client) => {
-      client.on('close', () => {
-        if (wsServer.clients.size === 0 || Date.now() - startTime > timeLimit)
-          resolve();
+      Array.from(wsServer.clients).forEach((client) => {
+        client.on('close', () => {
+          if (wsServer.clients.size === 0 || Date.now() - startTime > timeLimit)
+            resolve();
+        });
+
+        client.terminate();
       });
-
-      client.terminate();
-    });
+    }
   });
 
   await new Promise<void>((resolve) => {
